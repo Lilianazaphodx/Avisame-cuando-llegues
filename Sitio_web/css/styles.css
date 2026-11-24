@@ -1,0 +1,260 @@
+/* ==========================================================================
+   Avísame cuando llegues · Design system v0.2 (2026-11-24) · alineado con Figma de escritorio
+   Paleta: propuesta B "Andén nocturno" · Diseño: mapas_graficas_guerrilla
+   Estructura simplificada:  1 PRIMITIVOS  →  2 ALIAS (rol)  →  3 ESPECÍFICOS
+   Regla: los componentes usan ALIAS o ESPECÍFICOS, nunca primitivos directos.
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@700&family=Archivo:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Amatic+SC:wght@700&display=swap');
+
+:root{
+  /* ---------- 1 · PRIMITIVOS (valores crudos, no se usan directo) ---------- */
+  /* base noche */
+  --p-tinta:#0A0D12; --p-losa:#151A22; --p-rejilla:#262C36; --p-vapor:#9AA2AE; --p-luz:#EDEDE8;
+  /* luces (solo como evento, máx. 2 por pantalla) */
+  --p-sodio:#FF9E1B; --p-neon:#FF2E88; --p-senal:#1F5BD6; --p-crepusculo:#8A6BFF; --p-l3:#B5B83A;
+  /* base día (fondo elegido por la autora + derivados con contraste revisado) */
+  --p-dia:#BAB8B2; --p-dia-tarjeta:#D8D6D0; --p-dia-linea:#8F8D88; --p-dia-texto2:#3A3F48;
+  /* luces de día */
+  --p-neon-dia:#D0145F;      /* elegido por la autora: relleno */
+  --p-neon-dia-texto:#8E0C40; /* derivado: para texto sobre fondo día */
+  --p-sodio-dia:#5E3900; --p-l3-dia:#44460F; --p-senal-dia:#133C8F; --p-crepusculo-dia:#4433A8;
+  /* recursos guerrilla */
+  --p-cinta:#E9DFC2CC;
+
+  /* tipografías */
+  --f-slab:'Zilla Slab',Georgia,serif;          /* títulos y números de escena (700) */
+  --f-sans:'Archivo',system-ui,sans-serif;       /* señalética y texto */
+  --f-mono:'IBM Plex Mono',ui-monospace,monospace;/* datos y horas (400 / 500) */
+  --f-mano:'Amatic SC',cursive;                  /* anotaciones (700) */
+
+  /* escala tipográfica fluida: móvil 360 px → escritorio 1440 px
+     nombre            móvil→escr.   interlineado */
+  --t-portada:    clamp(3rem, 1.5rem + 6.667vw, 7.5rem);           /* 48→120  · 1.0 · "Bajo en indios verdes" (Figma View 4) */
+  --t-num-escena: clamp(4rem, 2.667rem + 5.926vw, 8rem);           /* 64→128  · 0.9  */
+  --t-display:    clamp(2.5rem, 1.75rem + 3.333vw, 4.75rem);       /* 40→76   · 1.08 */
+  --t-titulo:     clamp(1.875rem, 1.417rem + 2.037vw, 3.25rem);    /* 30→52   · 1.12 */
+  --t-subtitulo:  clamp(1.375rem, 1.208rem + 0.741vw, 1.875rem);   /* 22→30   · 1.2  */
+  --t-dato:       clamp(2.25rem, 1.667rem + 2.593vw, 4rem);        /* 36→64   · 1    */
+  --t-burbuja:    clamp(1.125rem, 0.979rem + 0.648vw, 1.5625rem);  /* 18→25   · 1.2  · Figma: Archivo Bold 25 */
+  --t-kicker:     clamp(0.875rem, 0.792rem + 0.370vw, 1.125rem);   /* 14→18   · 1.3  · Figma: Plex Mono 18 (horas en burbuja, "01. Porque viajamos", "Desliza…") */
+  --t-cuerpo:     clamp(1.0625rem, 1.021rem + 0.185vw, 1.1875rem); /* 17→19   · 1.55 */
+  --t-cuerpo-s:   clamp(0.9375rem, 0.917rem + 0.093vw, 1rem);      /* 15→16   · 1.5  */
+  --t-hora:       clamp(0.8125rem, 0.771rem + 0.185vw, 0.9375rem); /* 13→15   · 1.3  */
+  --t-senal:      clamp(0.75rem, 0.729rem + 0.093vw, 0.8125rem);   /* 12→13   · 1.2 · MAYÚS +0.08em */
+  --t-etiqueta:   clamp(0.6875rem, 0.667rem + 0.093vw, 0.75rem);   /* 11→12   · 1.3 · mapa/fuentes */
+  --t-anotacion:  clamp(1.5rem, 1.333rem + 0.741vw, 2rem);         /* 24→32   · 1.05 */
+  --lh-ajustado:0.9; --lh-portada:1; --lh-titulo:1.1; --lh-burbuja:1.2; --lh-texto:1.55;
+  --ls-senal:.08em;
+
+  /* espaciado (base 4) y medidas */
+  --e-1:4px; --e-2:8px; --e-3:12px; --e-4:16px; --e-5:24px; --e-6:32px; --e-7:48px; --e-8:72px;
+  --medida-texto:38ch; --radio-burbuja:14px; --radio-0:0;
+
+  /* responsivo: móvil primero. Puntos de quiebre (úsalos en @media, las variables no funcionan dentro de @media):
+     móvil < 768 px · tableta 768–1099 px · escritorio ≥ 1100 px */
+  --margen-lateral: clamp(16px, 4vw, 40px);   /* 16 px en 390 · 40 px en 1440 */
+  --columna-texto: 100%;                       /* móvil: texto a lo ancho, gráfica debajo/encima */
+  --ancho-max: 1440px;
+  --alto-barra: 48px;                         /* Figma: 60 px en escritorio */
+
+  /* ---------- 2 · ALIAS (modo NOCHE por defecto) ---------- */
+  --c-fondo:var(--p-tinta);
+  --c-superficie:var(--p-losa);
+  --c-linea:var(--p-rejilla);
+  --c-texto:var(--p-luz);
+  --c-texto-2:var(--p-vapor);
+  --c-acento:var(--p-neon);            /* relleno principal (franjas, burbuja "yo") */
+  --c-sobre-acento:var(--p-tinta);     /* texto encima del acento: 5.6:1 */
+  --c-acento-texto:var(--p-neon);      /* acento usado como texto: 5.6:1 sobre tinta */
+  --c-hora:var(--p-sodio);
+  --c-tiempo:var(--p-crepusculo);
+  --c-lugar:var(--p-l3);               /* Indios Verdes / estás aquí */
+  --c-enlace:var(--p-luz);             /* señal no da contraste como texto de noche (3.3:1): se usa en subrayado */
+  --c-enlace-marca:var(--p-senal);
+}
+
+/* ---------- 3 · ESPECÍFICOS ----------
+   Se declaran también en [data-modo] para que se recalculen cuando un bloque cambia a modo día
+   (una variable CSS se resuelve donde se declara, no donde se usa). */
+:root,[data-modo]{
+  /* narrativa */
+  --franja-fondo:var(--c-acento);       --franja-texto:var(--c-sobre-acento);
+  --burbuja-mama-fondo:var(--c-superficie); --burbuja-mama-texto:var(--c-texto);
+  --burbuja-mama-punto:var(--p-crepusculo);
+  --burbuja-yo-fondo:var(--c-acento);   --burbuja-yo-texto:var(--c-sobre-acento);
+  --burbuja-hora:var(--c-hora);
+  --sello-fondo:var(--p-luz);           --sello-texto:var(--p-tinta);
+  --cinta:var(--p-cinta);
+  --aviso-simulado:var(--c-acento-texto);
+  --titulo-destacado:var(--c-lugar);    /* 2ª línea del título de portada ("indios verdes" en L3) */
+  /* navegación (Figma: HEADER y "Navegación inferior") */
+  --barra-fondo:var(--p-losa); --barra-texto:var(--p-luz);
+  --riel-linea:var(--p-vapor); --riel-estacion:var(--p-vapor); --riel-actual:var(--p-neon); --riel-texto:var(--p-vapor);
+  --pastilla-fecha-fondo:var(--p-luz); --pastilla-fecha-texto:var(--p-rejilla);  /* "Hoy" */
+  --grano-opacidad:.35;
+
+  /* mapa (mínimo para el primer mapa) */
+  --map-fondo:var(--c-fondo);
+  --map-manzana:var(--c-superficie);
+  --map-vialidad:var(--c-linea);
+  --map-vialidad-primaria:#3A414D;
+  --map-limite:var(--c-texto-2);         /* límite municipal/alcaldía, punteado */
+  --map-etiqueta:var(--c-texto-2);
+  --map-etiqueta-fuerte:var(--c-texto);
+  --map-halo:var(--c-fondo);
+  --map-zona-foco:var(--c-acento);       /* Ecatepec (achurado) */
+  --map-linea3:var(--p-l3);
+  --map-metro:var(--p-senal);
+  --map-isocrona:var(--p-crepusculo);
+  --map-alumbrado:var(--p-sodio);
+
+  /* datos */
+  --data-seq-1:#2A1A2A; --data-seq-2:#5A1E45; --data-seq-3:#9A2364; --data-seq-4:#E02A7F; --data-seq-5:#FF8CBF;
+  --data-div-neg:var(--p-senal); --data-div-0:var(--p-rejilla); --data-div-pos:var(--p-sodio);
+  --data-cat-1:var(--p-neon); --data-cat-2:var(--p-sodio); --data-cat-3:var(--p-crepusculo); --data-cat-4:var(--p-l3); --data-cat-5:var(--p-senal);
+  --data-base:var(--c-texto-2);          /* barras sin resaltar */
+  --data-destacado:var(--c-acento);
+  --data-sin-dato:var(--c-linea);        /* + achurado */
+}
+
+/* retícula de escritorio: columna de texto + gráfica fija (sticky) */
+@media (min-width:768px){ :root{ --columna-texto:minmax(320px, 42%); --alto-barra:52px; } }
+@media (min-width:1100px){ :root{ --columna-texto:400px; --alto-barra:60px; } }
+
+/* ---------- MODO DÍA: solo cambian ALIAS y lo que no hereda ---------- */
+[data-modo="dia"]{
+  --c-fondo:var(--p-dia);
+  --c-superficie:var(--p-dia-tarjeta);
+  --c-linea:var(--p-dia-linea);
+  --c-texto:var(--p-tinta);              /* 9.8:1 */
+  --c-texto-2:var(--p-dia-texto2);       /* 5.3:1 */
+  --c-acento:var(--p-neon-dia);
+  --c-sobre-acento:var(--p-luz);         /* 4.5:1 */
+  --c-acento-texto:var(--p-neon-dia-texto);/* 4.7:1 */
+  --c-hora:var(--p-sodio-dia);           /* 5.1:1 */
+  --c-tiempo:var(--p-crepusculo-dia);
+  --c-lugar:var(--p-l3-dia);
+  --c-enlace:var(--p-senal-dia); --c-enlace-marca:var(--p-senal-dia);
+  --burbuja-mama-fondo:var(--p-tinta); --burbuja-mama-texto:var(--p-luz);
+  --burbuja-hora:var(--p-sodio);         /* la burbuja sigue oscura */
+  --sello-fondo:var(--p-tinta); --sello-texto:var(--p-luz);
+  --riel-linea:var(--p-dia-texto2); --riel-estacion:var(--p-dia-texto2); --riel-actual:var(--p-neon-dia); --riel-texto:var(--p-dia-texto2);
+  --map-vialidad-primaria:#6F6D69; --map-isocrona:var(--p-crepusculo-dia); --map-linea3:var(--p-l3-dia);
+  --map-metro:var(--p-senal-dia); --map-alumbrado:#B86A00;
+  --data-seq-1:#E4C9D3; --data-seq-2:#D98AA8; --data-seq-3:#D0145F; --data-seq-4:#8E0C40; --data-seq-5:#4A0620;
+  --data-cat-1:var(--p-neon-dia); --data-cat-2:var(--p-sodio-dia); --data-cat-3:var(--p-crepusculo-dia); --data-cat-4:var(--p-l3-dia); --data-cat-5:var(--p-senal-dia);
+  --grano-opacidad:.22;
+}
+
+/* ==========================================================================
+   SITIO · componentes (consumen los tokens de arriba; nunca primitivos)
+   Bloque añadido por el Agente 3 (Cartógrafo web) para el primer mapa.
+   ========================================================================== */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--c-fondo);color:var(--c-texto);font:400 var(--t-cuerpo)/var(--lh-texto) var(--f-sans);-webkit-font-smoothing:antialiased}
+
+/* cabecera */
+.cabecera{position:fixed;inset:0 0 auto 0;z-index:20;height:var(--alto-barra);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+  padding:0 var(--margen-lateral);background:var(--barra-fondo);color:var(--barra-texto);font:500 var(--t-etiqueta)/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase}
+.cabecera .contador{color:var(--c-hora)}
+.cabecera .menu{justify-self:end;background:none;border:0;color:inherit;font:inherit;letter-spacing:inherit;cursor:pointer}
+
+/* mapa fijo detrás de las escenas */
+#mapa{position:fixed;inset:var(--alto-barra) 0 0 0;z-index:0;background:var(--map-fondo)}
+#mapa::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;opacity:var(--grano-opacidad);mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2'/><feColorMatrix values='0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+.maplibregl-ctrl-attrib{font:400 10px/1.3 var(--f-mono)!important;background:color-mix(in srgb,var(--c-fondo) 80%,transparent)!important}
+
+/* escenas: van encima del mapa; solo los paneles reciben clics */
+#escenas{position:relative;z-index:10;pointer-events:none}
+.escena{min-height:100vh;padding:calc(var(--alto-barra) + var(--e-5)) var(--margen-lateral) calc(var(--e-8) + var(--e-5));display:flex;flex-direction:column;justify-content:space-between;gap:var(--e-5)}
+.panel{pointer-events:auto;width:min(100%, 440px);background:var(--p-tinta);color:var(--p-luz);border-radius:6px;padding:var(--e-5);box-shadow:0 6px 24px rgb(0 0 0 / .25)}
+.kicker{font:500 var(--t-hora)/1.3 var(--f-mono);color:var(--c-hora);letter-spacing:.06em;text-transform:uppercase}
+.franja{font:700 var(--t-titulo)/var(--lh-titulo) var(--f-slab);margin-top:var(--e-2)}
+.franja span{background:var(--franja-fondo);color:var(--franja-texto);padding:0 .14em;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.panel p{margin-top:var(--e-4);font:400 var(--t-cuerpo-s)/1.6 var(--f-mono);color:var(--p-luz);max-width:46ch}
+.subtitulo{font:700 var(--t-subtitulo)/1.2 var(--f-slab)}
+.nota{font:400 var(--t-etiqueta)/1.4 var(--f-mono);color:var(--p-vapor);margin-top:var(--e-2)}
+
+/* pestañas de categoría (Empleo · Escuelas · Salud · Cultura) */
+.pestanas{display:flex;flex-wrap:wrap;gap:var(--e-2);margin-top:var(--e-4)}
+.pestanas button{font:700 var(--t-senal)/1 var(--f-sans);letter-spacing:var(--ls-senal);text-transform:uppercase;padding:10px 12px;cursor:pointer;
+  background:transparent;color:var(--p-luz);border:1.5px solid var(--p-luz);border-radius:0}
+.pestanas button[aria-pressed="true"]{background:var(--c-acento);border-color:var(--c-acento);color:var(--c-sobre-acento)}
+.pestanas button:focus-visible{outline:2px solid var(--c-hora);outline-offset:2px}
+
+/* barras (componente del design system) */
+.barras{display:grid;gap:var(--e-3);margin-top:var(--e-4)}
+.barra{display:grid;grid-template-columns:1fr auto;gap:4px var(--e-3);font:600 var(--t-cuerpo-s)/1.3 var(--f-sans)}
+.barra b{font:500 var(--t-hora)/1.3 var(--f-mono);color:var(--p-sodio)}
+.barra .bb{grid-column:span 2;height:14px;background:repeating-linear-gradient(90deg,var(--p-rejilla) 0 8px,transparent 8px 11px)}
+.barra .bb i{display:block;height:100%;background:var(--p-luz)}
+.barra.on .bb i{background:var(--p-neon)}
+
+/* etiquetas del mapa (marcadores HTML: Plex Mono con halo del fondo para que se lean sobre los puntos) */
+.etq{font:500 var(--t-etiqueta)/1.15 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--map-etiqueta-fuerte);white-space:nowrap;pointer-events:none;
+  text-shadow:0 0 2px var(--map-halo),0 0 2px var(--map-halo),0 0 3px var(--map-halo),1px 1px 0 var(--map-halo),-1px -1px 0 var(--map-halo),1px -1px 0 var(--map-halo),-1px 1px 0 var(--map-halo)}
+.etq.alcaldia{color:var(--c-texto-2);font-weight:500;text-align:center;line-height:1.25}
+.etq.destino{font-size:10px;letter-spacing:.06em;text-transform:none;display:none}
+.etq.destino::before{content:"";display:inline-block;width:6px;height:6px;border:1.5px solid var(--map-etiqueta-fuerte);background:var(--map-halo);border-radius:50%;margin-right:5px;vertical-align:0}
+.mapa-cerca .etq.destino{display:block}
+.etq.isocrona{font-weight:500;color:var(--c-texto)}
+.sello{display:inline-block;font:500 var(--t-etiqueta)/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;background:var(--sello-fondo);color:var(--sello-texto);padding:6px 9px;transform:rotate(-3deg);position:relative;white-space:nowrap;pointer-events:none}
+.sello.cinta::before{content:"";position:absolute;width:44px;height:16px;background:var(--cinta);left:-14px;top:-10px;transform:rotate(-18deg)}
+.sello.l3{background:var(--p-l3);color:var(--p-tinta);border:1.5px solid var(--p-tinta);transform:rotate(-2deg)}
+.sello.claro{background:var(--p-luz);color:var(--p-tinta);border:1.5px solid var(--p-tinta);transform:rotate(-2deg)}
+.estacion{width:20px;height:20px;border-radius:50%;background:var(--p-luz);border:4px solid var(--p-tinta);pointer-events:none}
+
+/* leyenda (la construye mapa.js) */
+.leyenda{position:absolute;right:var(--margen-lateral);bottom:calc(var(--e-8) + var(--e-3));z-index:5;background:var(--p-tinta);color:var(--p-luz);padding:var(--e-4);
+  font:400 var(--t-etiqueta)/1.4 var(--f-mono);width:min(280px, calc(100vw - 2 * var(--margen-lateral)));border-radius:4px}
+.leyenda summary{cursor:pointer;list-style:none;font:700 var(--t-senal)/1.2 var(--f-sans);letter-spacing:var(--ls-senal);text-transform:uppercase}
+.leyenda summary::-webkit-details-marker{display:none}
+.leyenda summary::after{content:" +";color:var(--p-vapor)}
+.leyenda[open] summary::after{content:" –"}
+.leyenda .titulo{margin:var(--e-3) 0 var(--e-2);color:var(--p-luz)}
+.leyenda .rampa-pts{display:flex;align-items:flex-end;justify-content:space-between;gap:4px;height:30px}
+.leyenda .rampa-pts i{border-radius:50%;display:block}
+.leyenda .cortes{display:flex;justify-content:space-between;color:var(--p-vapor);margin-top:4px}
+.leyenda ul{list-style:none;display:grid;gap:6px;margin-top:var(--e-3);padding-top:var(--e-3);border-top:1px solid var(--p-rejilla)}
+.leyenda li{display:flex;gap:10px;align-items:center}
+.leyenda li i{width:26px;height:12px;flex:none}
+.leyenda .fuente{margin-top:var(--e-3);color:var(--p-vapor);font-size:10px}
+.aviso{display:inline-block;margin-top:var(--e-2);font:500 10px/1.3 var(--f-mono);letter-spacing:.08em;color:var(--p-tinta);background:var(--p-neon);padding:2px 6px;text-transform:uppercase}
+
+/* ventana emergente */
+.maplibregl-popup-content{background:var(--p-tinta);color:var(--p-luz);border-radius:4px;padding:var(--e-3) var(--e-4);font:400 var(--t-etiqueta)/1.5 var(--f-mono);box-shadow:0 4px 16px rgb(0 0 0 / .3)}
+.maplibregl-popup-tip{border-top-color:var(--p-tinta)!important;border-bottom-color:var(--p-tinta)!important}
+.maplibregl-popup-close-button{color:var(--p-vapor);font-size:16px;padding:2px 6px}
+.pop h4{font:700 var(--t-senal)/1.2 var(--f-sans);letter-spacing:var(--ls-senal);text-transform:uppercase;color:var(--p-sodio);margin-bottom:4px}
+.pop .grande{font:500 18px/1.2 var(--f-mono);color:var(--p-luz)}
+.pop .grande small{font-size:11px;color:var(--p-vapor)}
+.pop dl{display:grid;grid-template-columns:auto auto;gap:0 var(--e-3);margin-top:6px;color:var(--p-vapor)}
+.pop dd{text-align:right;color:var(--p-luz)}
+
+/* riel inferior (7 estaciones) */
+.riel{position:fixed;left:0;right:0;bottom:0;z-index:15;height:var(--e-8);display:flex;justify-content:space-between;align-items:flex-end;padding:0 var(--margen-lateral) var(--e-4);
+  background:linear-gradient(to top,color-mix(in srgb,var(--p-dia) 92%,transparent) 55%,transparent)}
+.riel::before{content:"";position:absolute;left:calc(var(--margen-lateral) + 6px);right:calc(var(--margen-lateral) + 6px);bottom:calc(var(--e-4) + 5px);height:2px;background:var(--riel-linea)}
+.riel::after{content:"";position:absolute;left:calc(var(--margen-lateral) + 6px);width:var(--avance,16%);bottom:calc(var(--e-4) + 5px);height:2px;background:var(--riel-actual)}
+.riel a{position:relative;z-index:1;width:12px;height:12px;border-radius:50%;background:var(--riel-estacion)}
+.riel a.ok{background:var(--riel-actual)}
+.riel a.act{width:16px;height:16px;margin-bottom:-2px;background:var(--c-fondo);box-shadow:0 0 0 3px var(--riel-actual)}
+.riel b{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);white-space:nowrap;font:500 var(--t-etiqueta)/1 var(--f-mono);color:var(--riel-texto);text-transform:uppercase;display:none}
+.riel a:first-child b{left:0;transform:none}.riel a:last-child b{left:auto;right:0;transform:none}
+.riel a.act b{display:block;color:var(--c-texto)}
+@media (min-width:1100px){.riel b{display:block}}
+
+/* móvil: el panel de texto arriba y compacto; leyenda plegada */
+@media (max-width:767px){
+  .panel{padding:var(--e-4)}
+  .panel p{font-size:var(--t-etiqueta);margin-top:var(--e-3)}
+  .franja{font-size:var(--t-subtitulo)}
+  .pestanas{gap:6px;margin-top:var(--e-3)}
+  .pestanas button{padding:8px 8px;font-size:11px;letter-spacing:.04em}
+  .sello.claro{display:none}
+  .panel.grafica{display:none}
+  .leyenda{bottom:calc(var(--e-8) + var(--e-2))}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}

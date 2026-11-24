@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Avísame cuando llegues</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- cabecera -->
+<header class="cabecera">
+  <span>Bajo en Indios Verdes</span>
+  <span class="contador">02 / 07</span>
+  <button class="menu" type="button">▦ Menú</button>
+</header>
+
+<!-- 1 · contenedor del mapa fijo (lo llena js/mapa.js) -->
+<div id="mapa" data-modo="dia" role="region" aria-label="Mapa de oportunidades en la Ciudad de México y Ecatepec"></div>
+
+<!-- 2 · contenedor de las escenas (scrollytelling.js las observa) -->
+<main id="escenas">
+  <section class="escena" id="escena-02" data-escena="02">
+    <div class="panel">
+      <div class="kicker">02 · Mapa de oportunidades</div>
+      <h1 class="franja"><span>Oportunidades</span></h1>
+      <div class="pestanas" role="group" aria-label="Qué mostrar en el mapa">
+        <button type="button" data-categoria="empleo" aria-pressed="true">Empleo</button>
+        <button type="button" data-categoria="escuelas" aria-pressed="false">Escuelas</button>
+        <button type="button" data-categoria="salud" aria-pressed="false">Salud</button>
+        <button type="button" data-categoria="cultura" aria-pressed="false">Cultura</button>
+      </div>
+      <p data-texto="empleo">Cada punto resume el trabajo en un hexágono de medio kilómetro: mientras más grande y oscuro, más empleos hay ahí. La línea punteada marca hasta dónde se llega en 60 minutos desde Ecatepec.</p>
+    </div>
+
+    <div class="panel grafica">
+      <h2 class="subtitulo">A 60 minutos de casa</h2>
+      <div class="nota">% de los empleos de la CDMX y Ecatepec que se alcanzan en transporte público, saliendo de 6:30 a 7:30</div>
+      <div class="barras" id="barras-60"></div>
+    </div>
+  </section>
+</main>
+
+<!-- riel inferior: 7 estaciones -->
+<nav class="riel" aria-label="Escenas" style="--avance:16%">
+  <a href="#escena-01" class="ok"><b>01 Razones</b></a>
+  <a href="#escena-02" class="act" aria-current="step"><b>02 Oportunidades</b></a>
+  <a href="#escena-03"><b>03 Tiempo</b></a>
+  <a href="#escena-04"><b>04 Noche</b></a>
+  <a href="#escena-05"><b>05 Seguridad</b></a>
+  <a href="#escena-06"><b>06 No llegaron</b></a>
+  <a href="#escena-07"><b>07 Llegué</b></a>
+</nav>
+
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="js/mapa.js"></script>
+<!-- cuando existan: <script src="js/scrollytelling.js"></script> <script src="js/charts_d3.js"></script> -->
+<script>
+/* Conexión provisional de la escena 02 (la reemplazan scrollytelling.js y charts_d3.js) */
+const TEXTOS = {
+  empleo: 'Cada punto resume el trabajo en un hexágono de medio kilómetro: mientras más grande y oscuro, más empleos hay ahí. La línea punteada marca hasta dónde se llega en 60 minutos desde Ecatepec.',
+  escuelas: 'Escuelas de todos los niveles, públicas y privadas. Mientras más grande y oscuro el punto, más escuelas hay en ese hexágono.',
+  salud: 'Clínicas, hospitales, consultorios y centros de asistencia social con 6 o más personas trabajando.',
+  cultura: 'Museos, teatros, centros culturales, deportivos y otros espacios de recreación con 6 o más personas trabajando.'
+};
+Mapa.iniciar('mapa').then(() => {
+  Mapa.escena({ capas: ['base', 'transporte', 'linea3', 'ecatepec', 'oportunidades', 'isocrona60', 'etiquetas'], categoria: 'empleo', encuadre: 'trayecto' });
+});
+document.querySelectorAll('[data-categoria]').forEach((b) => b.addEventListener('click', async () => {
+  await Mapa.listo;
+  document.querySelectorAll('[data-categoria]').forEach((x) => x.setAttribute('aria-pressed', x === b));
+  Mapa.categoria(b.dataset.categoria);
+  document.querySelector('[data-texto]').textContent = TEXTOS[b.dataset.categoria];
+}));
+// gráfica provisional: % de empleos a 60 min desde las colonias de Ecatepec (datos reales del modelo de isócronas)
+fetch('mapas/colonias_origen.geojson').then((r) => r.json()).then((d) => {
+  const c = d.features.map((f) => f.properties).sort((a, b) => b.pct_empleo_60 - a.pct_empleo_60);
+  const med = c[Math.floor(c.length / 2)];
+  const filas = [
+    ['Mejor conectada · ' + c[0].colonia, c[0].pct_empleo_60, ''],
+    ['Colonia típica · ' + med.colonia, med.pct_empleo_60, 'on'],
+    ['Peor conectada · ' + c[c.length - 1].colonia, c[c.length - 1].pct_empleo_60, '']
+  ];
+  document.getElementById('barras-60').innerHTML = filas.map(([t, v, k]) =>
+    `<div class="barra ${k}"><span>${t}</span><b>${v.toLocaleString('es-MX')} %</b><div class="bb"><i style="width:${v}%"></i></div></div>`).join('');
+});
+</script>
+</body>
+</html>
